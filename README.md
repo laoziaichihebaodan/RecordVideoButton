@@ -8,9 +8,9 @@
 
 ## 2.支持分段录制，可以删除最后一段录制片段
 
-![Image text](gif/RecordVideoButton1.gif)
-![Image text](gif/RecordVideoButton2.gif)
-![Image text](gif/RecordVideoButton3.gif)
+[![fB1pn0.gif](https://z3.ax1x.com/2021/08/12/fB1pn0.gif)](https://imgtu.com/i/fB1pn0)
+[![fBlzXq.gif](https://z3.ax1x.com/2021/08/12/fBlzXq.gif)](https://imgtu.com/i/fBlzXq)
+[![fBlxcn.gif](https://z3.ax1x.com/2021/08/12/fBlxcn.gif)](https://imgtu.com/i/fBlxcn)
 
 # 自定义属性
 
