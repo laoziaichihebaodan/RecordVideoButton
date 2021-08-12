@@ -4,7 +4,7 @@
 ## 1.支持设置最大最小时长
 ## 2.支持分段录制，可以删除最后一段录制片段
 
-#自定义属性
+# 自定义属性
 <declare-styleable name="RecordVideoButton">
         <!-- 外部圆环的颜色 -->
         <attr name="out_circle_color" format="color" />
