@@ -1,11 +1,15 @@
 # RecordVideoButton
+
 ## 仿抖音视频录制按钮2021年
+
 ## 功能介绍：
+
 ## 1.支持设置最大最小时长
+
 ## 2.支持分段录制，可以删除最后一段录制片段
 
 # 自定义属性
-<declare-styleable name="RecordVideoButton">
+
         <!-- 外部圆环的颜色 -->
         <attr name="out_circle_color" format="color" />
         <!-- 内部圆角矩形的颜色 -->
@@ -38,7 +42,6 @@
         <attr name="long_click_min_time" format="integer" />
         <!-- 状态变化动画时长 -->
         <attr name="state_change_animate_time" format="integer" />
-    </declare-styleable>
 
 ![Image text](gif/RecordVideoButton1.gif)
 ![Image text](gif/RecordVideoButton2.gif)
