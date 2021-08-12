@@ -8,6 +8,10 @@
 
 ## 2.支持分段录制，可以删除最后一段录制片段
 
+![Image text](gif/RecordVideoButton1.gif)
+![Image text](gif/RecordVideoButton2.gif)
+![Image text](gif/RecordVideoButton3.gif)
+
 # 自定义属性
 
         <!-- 外部圆环的颜色 -->
@@ -43,6 +47,3 @@
         <!-- 状态变化动画时长 -->
         <attr name="state_change_animate_time" format="integer" />
 
-![Image text](gif/RecordVideoButton1.gif)
-![Image text](gif/RecordVideoButton2.gif)
-![Image text](gif/RecordVideoButton3.gif)
