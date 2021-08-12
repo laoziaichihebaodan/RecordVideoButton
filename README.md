@@ -8,6 +8,8 @@
 
 ## 2.支持分段录制，可以删除最后一段录制片段
 
+## 3.支持点击录制、点击暂停和长按录制松手暂停
+
 [![fB1pn0.gif](https://z3.ax1x.com/2021/08/12/fB1pn0.gif)](https://imgtu.com/i/fB1pn0)
 [![fBlzXq.gif](https://z3.ax1x.com/2021/08/12/fBlzXq.gif)](https://imgtu.com/i/fBlzXq)
 [![fBlxcn.gif](https://z3.ax1x.com/2021/08/12/fBlxcn.gif)](https://imgtu.com/i/fBlxcn)
