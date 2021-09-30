@@ -34,6 +34,13 @@
         <attr name="long_click_min_time" format="integer" />
         <!-- 状态变化动画时长 -->
         <attr name="state_change_animate_time" format="integer" />
+        <!-- 行为：capture: 拍照 record_video:录像-->
+        <attr name="action">
+            <enum name="capture" value="0"/>
+            <enum name="record_video" value="1"/>
+        </attr>
+        <!-- 是否支持分段录制-->
+        <attr name="is_support_part_record" format="boolean" />
     </declare-styleable>
 
 </resources>

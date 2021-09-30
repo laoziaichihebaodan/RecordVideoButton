@@ -15,9 +15,6 @@ import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-
-import com.example.recordvideobutton.R;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +30,7 @@ public class RecordVideoButton extends View {
     private float mOutCircleRadius;
     //里面圆角矩形
     private Paint mInnerRectPaint;
-    private int innerRectColor = Color.RED;
+    private int innerRectColor = 0xFFEA7172;
     private final RectF mRectF = new RectF();
     private float rectWidth;
     private float corner;
@@ -57,7 +54,7 @@ public class RecordVideoButton extends View {
     private float mMaxOutBackgroundCircleRadius;
     private float mMiddleOutBackgroundCircleRadius;//暂停时的大小
     private float mMinOutBackgroundCircleRadius;
-    private int mOutBackgroundCircleColor = 0x50FFFFFF;
+    private int mOutBackgroundCircleColor = 0x66FFFFFF;
 
     private float innerRectMaxDividerWidth = 15;//最大时外面距离圆环的宽度
 
@@ -65,6 +62,7 @@ public class RecordVideoButton extends View {
     private RecordState mRecordState = RecordState.ORIGIN;
     private final Handler mHandler = new Handler();
     private OnRecordStateChangedListener mOnRecordStateChangedListener;
+    private OnCaptureClickListener onCaptureClickListener;
     private final ClickRunnable mClickRunnable = new ClickRunnable();
 
     private final AnimatorSet mBeginAnimatorSet = new AnimatorSet();
@@ -77,7 +75,7 @@ public class RecordVideoButton extends View {
     //进度条
     private Paint mPartProgressPaint;
     private Paint mPartPointPaint;
-    private int partProgressPaintColor = Color.RED;
+    private int partProgressPaintColor = 0xFFEA7172;
     private int partPointColor = Color.WHITE;
     private float partRecordProgressWidth = 15;
     private final RectF progressRect = new RectF();
@@ -94,6 +92,13 @@ public class RecordVideoButton extends View {
     private int longClickMinTime = 500;
     private int animationTime = 400;
 
+    private Action action = Action.recordVideo;
+    private boolean isSupportPartRecord;//是否支持分段录制
+
+    public enum Action{
+        capture,//拍照
+        recordVideo//录像
+    }
     public RecordVideoButton(Context context) {
         this(context, null);
     }
@@ -123,6 +128,15 @@ public class RecordVideoButton extends View {
             isVisibleMinTimePoint = a.getBoolean(R.styleable.RecordVideoButton_min_time_point_visible, isVisibleMinTimePoint);
             longClickMinTime = a.getInt(R.styleable.RecordVideoButton_long_click_min_time, longClickMinTime);
             animationTime = a.getInt(R.styleable.RecordVideoButton_state_change_animate_time, animationTime);
+            isSupportPartRecord = a.getBoolean(R.styleable.RecordVideoButton_is_support_part_record, true);
+            switch (a.getInt(R.styleable.RecordVideoButton_action,1)){
+                case 0:
+                    action = Action.capture;
+                    break;
+                case 1:
+                    action = Action.recordVideo;
+                    break;
+            }
             a.recycle();
         }
         if (mMinCorner == 0){
@@ -302,27 +316,43 @@ public class RecordVideoButton extends View {
         canvas.drawCircle(centerX, centerY, mOutCircleRadius, mOutCirclePaint);
     }
 
+    public void setOnCaptureClickListener(OnCaptureClickListener onCaptureClickListener) {
+        this.onCaptureClickListener = onCaptureClickListener;
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                mRecordMode = RecordMode.SINGLE_CLICK;
-                if (mRecordState == RecordState.ORIGIN) {
-                    mHandler.postDelayed(mClickRunnable, longClickMinTime);
-                    startRecord();
-                } else if (mRecordState == RecordState.PAUSE) {
-                    mHandler.postDelayed(mClickRunnable, longClickMinTime);
-                    continueRecord();
-                } else if (mRecordState == RecordState.RECORDING) {
-                    onRecordPause();
+                if (action == Action.recordVideo) {
+                    mRecordMode = RecordMode.SINGLE_CLICK;
+                    if (mRecordState == RecordState.ORIGIN) {
+                        mHandler.postDelayed(mClickRunnable, longClickMinTime);
+                        startRecord();
+                    } else if (mRecordState == RecordState.PAUSE) {
+                        mHandler.postDelayed(mClickRunnable, longClickMinTime);
+                        continueRecord();
+                    } else if (mRecordState == RecordState.RECORDING) {
+                        if (isSupportPartRecord){
+                            onRecordPause();
+                        }else{
+                            recordStop();
+                        }
+                    }
                 }
                 break;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
-                if (mRecordMode == RecordMode.LONG_CLICK && mRecordState != RecordState.STOP) {
-                    mHandler.removeCallbacks(mClickRunnable);
-                    onRecordPause();
+                if (action == Action.recordVideo) {
+                    if (mRecordMode == RecordMode.LONG_CLICK && mRecordState != RecordState.STOP) {
+                        mHandler.removeCallbacks(mClickRunnable);
+                        onRecordPause();
+                    }
+                }else if (action == Action.capture){
+                    if (onCaptureClickListener != null){
+                        onCaptureClickListener.onClick(this);
+                    }
                 }
                 break;
             default:
@@ -332,7 +362,7 @@ public class RecordVideoButton extends View {
     }
 
     //暂停录制
-    private void recordStop() {
+    public void recordStop() {
         recordPart();
         mRecordState = RecordState.STOP;
         startPauseRecordAnimation();
@@ -357,6 +387,7 @@ public class RecordVideoButton extends View {
             mOnRecordStateChangedListener.onContinueRecord();
         }
     }
+
     //开始录制失败
     public void startRecordFailed(){
         startPauseRecordAnimation();
@@ -379,12 +410,15 @@ public class RecordVideoButton extends View {
 
     //记录分段
     public void recordPart() {
-        PartRecordItem item = new PartRecordItem();
-        item.startAngle = defaultStartAngle + getSweepAngle(getLastEndRecordTime());
-        item.endRecordTime = currentRecordTime;
-        item.sweepAngle = getSweepAngle(item.endRecordTime - getLastEndRecordTime());
-        recordItems.add(item);
+        if (isSupportPartRecord){
+            PartRecordItem item = new PartRecordItem();
+            item.startAngle = defaultStartAngle + getSweepAngle(getLastEndRecordTime());
+            item.endRecordTime = currentRecordTime;
+            item.sweepAngle = getSweepAngle(item.endRecordTime - getLastEndRecordTime());
+            recordItems.add(item);
+        }
         invalidate();
+
     }
 
     private void startBeginAnimation() {
@@ -499,19 +533,21 @@ public class RecordVideoButton extends View {
     public void deleteLastPartRecord() {
         if (recordItems.size() > 0) {
             if (recordItems.size() == 1) {
-                currentRecordTime = 0;
-                recordItems.remove(recordItems.get(0));
-                startEndAnimation();
+                resetRecordState();
             } else {
                 recordItems.remove(recordItems.get(recordItems.size() - 1));
                 currentRecordTime = getLastEndRecordTime();
                 mRecordState = RecordState.PAUSE;
                 invalidate();
             }
-            if (mOnRecordStateChangedListener != null){
-                mOnRecordStateChangedListener.onDeleteLastPart(recordItems.size(),currentRecordTime);
-            }
         }
+    }
+    //重置录制状态为original
+    public void resetRecordState(){
+        mRecordState = RecordState.ORIGIN;
+        currentRecordTime = 0;
+        recordItems.clear();
+        startEndAnimation();
     }
 
     static class PartRecordItem {
@@ -558,6 +594,10 @@ public class RecordVideoButton extends View {
         LONG_CLICK,
     }
 
+    public interface OnCaptureClickListener{
+        void onClick(View view);
+    }
+
     public interface OnRecordStateChangedListener {
 
         /**
@@ -582,8 +622,6 @@ public class RecordVideoButton extends View {
 
         /**
          * 删除最后一段
-         * @param partsSize 剩余片段的数量
-         * @param duration  最后一个片段的录制时间
          */
         void onDeleteLastPart(int partsSize, long duration);
 
@@ -591,5 +629,11 @@ public class RecordVideoButton extends View {
 
     private int dip2px(float paramFloat) {
         return (int)(0.5F + paramFloat * getContext().getResources().getDisplayMetrics().density);
+    }
+
+    public void setAction(Action action) {
+        this.action = action;
+        resetRecordState();
+        invalidate();
     }
 }

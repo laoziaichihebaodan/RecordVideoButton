@@ -10,6 +10,15 @@
 
 ## 3.支持点击录制、点击暂停和长按录制松手暂停
 
+## 4.新增属性
+        <!-- 行为：capture: 拍照 record_video:录像-->
+        <attr name="action">
+            <enum name="capture" value="0"/>
+            <enum name="record_video" value="1"/>
+        </attr>
+        <!-- 是否支持分段录制--> 
+        <attr name="is_support_part_record" format="boolean" />
+
 [![fB1pn0.gif](https://z3.ax1x.com/2021/08/12/fB1pn0.gif)](https://imgtu.com/i/fB1pn0)
 [![fBlzXq.gif](https://z3.ax1x.com/2021/08/12/fBlzXq.gif)](https://imgtu.com/i/fBlzXq)
 [![fBlxcn.gif](https://z3.ax1x.com/2021/08/12/fBlxcn.gif)](https://imgtu.com/i/fBlxcn)
@@ -48,4 +57,11 @@
         <attr name="long_click_min_time" format="integer" />
         <!-- 状态变化动画时长 -->
         <attr name="state_change_animate_time" format="integer" />
+        <!-- 行为：capture: 拍照 record_video:录像-->
+        <attr name="action">
+            <enum name="capture" value="0"/>
+            <enum name="record_video" value="1"/>
+        </attr>
+        <!-- 是否支持分段录制-->
+        <attr name="is_support_part_record" format="boolean" />
 
